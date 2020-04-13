@@ -3,7 +3,6 @@ Various widgets made for i3blocks.
 All of them support CLI arguments, so flags and basic functionality can be displayed using the `--help` command.
 General design includes a shorthand format for when i3blocks gets too long, lots of flags for different display settings, and the ability to change devices for hardware monitors.
 <img src="./src/screeny.png" />
----
 Note that these are my projects for learning Rust, so don't expect me to be Hackerman™.
 
 ## nvidia-status
