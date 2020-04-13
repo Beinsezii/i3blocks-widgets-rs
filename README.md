@@ -6,7 +6,7 @@ General design includes a shorthand format for when i3blocks gets too long, lots
 Note that these are my projects for learning Rust, so don't expect me to be Hackerman™.
 
 ## nvidia-status
-Shows lots of information for Nvidia GPUs.
+Shows lots of information for Nvidia GPUs. Needs `nvidia-smi` installed.
 - Changes color based on GPU status.
 - Many flags for which stats to show.
 
