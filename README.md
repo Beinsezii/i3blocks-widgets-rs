@@ -36,7 +36,7 @@ To be used with quodlibet-status. Separate binary since they should be two separ
     - Scrollwheel -> Volume up/down
 
 ## i3blocks usage
-All of these use standard CLI flags and options instead of environment variables like i3blocks does by default. This is easier to manage IMO, and to make it work inside i3blocks is rather easy config-wise.
+All of these use standard CLI flags and options instead of environment variables like i3blocks does by default. This is easier to manage IMO. Here's how to set up the i3blocks config with that in mind.
 
 Example using pulse-status to display the default input source:
 ```
