@@ -20,7 +20,7 @@ Creates an interactive widget for a given pulse device.
     - Scrollwheel -> Adjust volume
 
 ## quodlibet-status
-Creates an interactive widget for the Quod Libet music player
+Creates an interactive widget for the Quod Libet music player. A bit less cool than the rest as this was the first program and hasn't been updated much.
 - Shows title, artist, album.
 - Optionally displays 'discsubtitle'. I find this useful as a custom field to do with what I wish. Example is I have a mixed album of bgm from the Yakuza games, and I use the 'discsubtitle' field to label which game it's from.
 - Buttons
