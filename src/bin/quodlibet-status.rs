@@ -20,22 +20,27 @@ struct Opts {
     #[clap(long = "stop", default_value = "⏹️")]
     icon_stop: String,
 
-    /// Shows 'discsubtitle' tag preceding the title.
-    #[clap(long = "dst")]
-    discsubtitle: bool,
+    /// Format string for the long view
+    #[clap(long, short, default_value="<title><artist| / <artist>><album| / <album>>")]
+    long: String,
+
+    /// Format string for the short view
+    #[clap(long, short, default_value="<title>")]
+    short: String,
 }
 
 fn main() {
     // console args.
     let opts: Opts = Opts::parse();
 
+    let error_c = opts.color_error;
     let fail = |text: &str| {
         //long format
         println!("{}", text);
         //short format
         println!("{}", text);
         //color
-        println!("{}", opts.color_error);
+        println!("{}", error_c);
     };
 
     match opts.button {
@@ -54,20 +59,12 @@ fn main() {
         None => None,
     };
 
-    // it takes about 0.1 to 0.15 seconds for a single run of quodlibet.
-    // multiply that by 5 and it can take up to whole-ass 2/3 second after a click to update the
-    // screen. Idk why it's so slow to get a single string but here we are multi-threading prints
-    // because apparently getting the formatted text takes like .15 real seconds of CPU time.
+    // it takes about 0.1 to 0.15 seconds for a single run of quodlibet, so threads.
+    let long_in = opts.long;
+    let short_in = opts.short;
     let status_t = std::thread::spawn(|| shell("quodlibet", &["--status"]));
-    let title_t = std::thread::spawn(|| shell("quodlibet", &["--print-playing", "<title>"]));
-    let artist_t = std::thread::spawn(|| shell("quodlibet", &["--print-playing", "<artist>"]));
-    let album_t = std::thread::spawn(|| shell("quodlibet", &["--print-playing", "<album>"]));
-    // would like to only spawn this if enabled but haven't thought of a pretty way to do so.
-    // one option would be spawning a dummy thread that just echos I guess. Rust ain't smart
-    // enough to figure out that disc_t will always be initialized if I put both this and the
-    // thread join in `if opts.discsubtitle` blocks.
-    // Just worry about the performance hit on low-core systems
-    let disc_t = std::thread::spawn(|| shell("quodlibet", &["--print-playing", "<discsubtitle>"]));
+    let long_t = std::thread::spawn(move || shell("quodlibet", &["--print-playing", &long_in]));
+    let short_t = std::thread::spawn(move || shell("quodlibet", &["--print-playing", &short_in]));
 
     let status = match status_t.join().unwrap() {
         None => {
@@ -76,25 +73,12 @@ fn main() {
         }
         Some(result) => result,
     };
-    let disc = match disc_t.join().unwrap() {
-            None => "".to_string(),
-            Some(result) => {
-                if opts.discsubtitle { result + " - " }
-                else {"".to_string()}
-            },
-        };
-    let title = match title_t.join().unwrap() {
-        // Technically quodlibet should return "foo.mp3 [Unknown]" if no title is found but
-        // just in case.
-        None => "Unknown Title".to_string(),
+    let long = match long_t.join().unwrap() {
+        None => "Long String Error".to_string(),
         Some(result) => result,
     };
-    let artist = match artist_t.join().unwrap() {
-        None => "Unknown Artist".to_string(),
-        Some(result) => result,
-    };
-    let album = match album_t.join().unwrap() {
-        None => "Unknown Album".to_string(),
+    let short = match short_t.join().unwrap() {
+        None => "Short String Error".to_string(),
         Some(result) => result,
     };
 
@@ -114,7 +98,7 @@ fn main() {
     }
 
     // long format
-    println!("{} {}{} / {} / {}", icon, disc, title, artist, album);
+    println!("{} {}", icon, long);
     // short format
-    println!("{} {}", icon, title);
+    println!("{} {}", icon, short);
 }
